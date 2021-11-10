@@ -3,5 +3,6 @@ from django.http import HttpResponse
 
 
 def say_hello(request):
-  return HttpResponse('Hello world!')
-
+  x = 1
+  y = 2
+  return render(request, 'hello.html')
