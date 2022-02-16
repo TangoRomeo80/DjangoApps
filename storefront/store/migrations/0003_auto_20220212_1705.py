@@ -16,6 +16,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterModelTable(
             name='customer',
-            table='store_customers',
+            table='store_customer',
         ),
     ]
