@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.db.models.aggregates import Count
+from django.urls import reverse
+from django.utils.html import format_html
 from . import models
 
 @admin.register(models.Product)
@@ -35,8 +37,9 @@ class CollectionAdmin(admin.ModelAdmin):
 
   @admin.display(ordering='products_count')
   def products_count(self, collection):
-    return collection.products_count
-
+    reverse('admin:store_product_changelist')
+    return format_html('<a href="{}">{}</a>', url, collection.products_count)
+     
   def get_queryset(self, request):
     return super().get_queryset(request).annotate(
       products_count=Count('product')
