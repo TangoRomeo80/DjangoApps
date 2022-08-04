@@ -53,10 +53,18 @@ class CustomerAdmin(admin.ModelAdmin):
   ordering = ['first_name', 'last_name']
   search_fields = ['first_name__istartswith', 'last_name__istartswith']
 
+class OrderItemInline(admin.TabularInline):
+    autocomplete_fields = ['product']
+    min_num = 1
+    max_num = 10
+    model = models.OrderItem
+    extra = 0
+
 @admin.register(models.Order)
 class OrderAdmin(admin.ModelAdmin):
   list_display = ['id', 'placed_at', 'customer']
   autocomplete_fields = ['customer']
+  inlines = [OrderItemInline]
 
 @admin.register(models.Collection)
 class CollectionAdmin(admin.ModelAdmin):
