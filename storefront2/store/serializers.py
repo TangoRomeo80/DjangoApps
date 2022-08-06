@@ -2,7 +2,7 @@ from decimal import Decimal
 from store.models import Product, Collection
 from rest_framework import serializers
 
-class CollectionSerializer(serializers.Serializer):
+class CollectionSerializer(serializers.ModelSerializer):
   class Meta:
     model = Collection
     fields = ['id', 'title', 'products_count']
