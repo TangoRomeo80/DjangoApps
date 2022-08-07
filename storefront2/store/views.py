@@ -5,6 +5,7 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
 from .models import Collection, Product
 from .serializers import CollectionSerializer, ProductSerializer
@@ -36,12 +37,12 @@ from .serializers import CollectionSerializer, ProductSerializer
 #         serializer.save()
 #         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-class ProductList(ListCreateAPIView):
-    queryset = Product.objects.select_related('collection').all()
-    serializer_class = ProductSerializer
+# class ProductList(ListCreateAPIView):
+#     queryset = Product.objects.all()
+#     serializer_class = ProductSerializer
 
-    def perform_create(self, serializer):
-        serializer.save(collection=self.request.collection)
+    # def get_serializer_context(self):
+    #     return {'request': self.request}
 
 # @api_view(['GET', 'PUT', 'DELETE'])
 # def product_detail(request, id):
@@ -60,9 +61,16 @@ class ProductList(ListCreateAPIView):
 #         product.delete()
 #         return Response(status=status.HTTP_204_NO_CONTENT)
 
-class ProductDetail(RetrieveUpdateDestroyAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
+# class ProductDetail(RetrieveUpdateDestroyAPIView):
+#     queryset = Product.objects.all()
+#     serializer_class = ProductSerializer
+
+#     def delete(self, request, pk):
+#         product = get_object_or_404(Product, pk=pk)
+#         if product.orderitems.count() > 0:
+#             return Response({'error': 'Product cannot be deleted because it is associated with an order item.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+#         product.delete()
+#         return Response(status=status.HTTP_204_NO_CONTENT)
 
     # def get(self, request, id):
     #     product = get_object_or_404(Product, pk=id)
@@ -76,6 +84,13 @@ class ProductDetail(RetrieveUpdateDestroyAPIView):
     #     serializer.save()
     #     return Response(serializer.data)
 
+class ProductViewSet(ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+    def get_serializer_context(self):
+        return {'request': self.request}
+
     def delete(self, request, pk):
         product = get_object_or_404(Product, pk=pk)
         if product.orderitems.count() > 0:
@@ -83,10 +98,22 @@ class ProductDetail(RetrieveUpdateDestroyAPIView):
         product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-class CollectionList(ListCreateAPIView):
+
+class CollectionViewSet(ModelViewSet):
     queryset = Collection.objects.annotate(
         products_count=Count('products')).all()
     serializer_class = CollectionSerializer
+
+    def delete(self, request, pk):
+        collection = get_object_or_404(Collection, pk=pk)
+        if collection.products.count() > 0:
+            return Response({'error': 'Collection cannot be deleted because it includes one or more products.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        collection.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+# class CollectionList(ListCreateAPIView):
+#     queryset = Collection.objects.annotate(
+#         products_count=Count('products')).all()
+#     serializer_class = CollectionSerializer
 
 # @api_view(['GET', 'PUT', 'DELETE'])
 # def collection_detail(request, pk):
@@ -107,10 +134,10 @@ class CollectionList(ListCreateAPIView):
 #         collection.delete()
 #         return Response(status=status.HTTP_204_NO_CONTENT)
 
-class CollectionDetail(RetrieveUpdateDestroyAPIView):
-    queryset = Collection.objects.annotate(
-        products_count=Count('products'))
-    serializer_class = CollectionSerializer
+# class CollectionDetail(RetrieveUpdateDestroyAPIView):
+#     queryset = Collection.objects.annotate(
+#         products_count=Count('products'))
+#     serializer_class = CollectionSerializer
 
     # def get(self, request, pk):
     #     collection = get_object_or_404(
@@ -128,9 +155,9 @@ class CollectionDetail(RetrieveUpdateDestroyAPIView):
     #     serializer.save()
     #     return Response(serializer.data)
 
-    def delete(self, request, pk):
-        collection = get_object_or_404(Collection, pk=pk)
-        if collection.products.count() > 0:
-            return Response({'error': 'Collection cannot be deleted because it includes one or more products.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-        collection.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    # def delete(self, request, pk):
+    #     collection = get_object_or_404(Collection, pk=pk)
+    #     if collection.products.count() > 0:
+    #         return Response({'error': 'Collection cannot be deleted because it includes one or more products.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    #     collection.delete()
+    #     return Response(status=status.HTTP_204_NO_CONTENT)
