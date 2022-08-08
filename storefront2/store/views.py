@@ -7,8 +7,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
-from .models import Collection, Product, OrderItem
-from .serializers import CollectionSerializer, ProductSerializer
+from .models import Collection, Product, OrderItem, Review
+from .serializers import CollectionSerializer, ProductSerializer, ReviewSerializer
 
 
 # @api_view(['GET', 'POST'])
@@ -121,6 +121,11 @@ class CollectionViewSet(ModelViewSet):
     #     collection.delete()
     #     return Response(status=status.HTTP_204_NO_CONTENT)
     
+
+class ReviewViewSet(ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+
 # class CollectionList(ListCreateAPIView):
 #     queryset = Collection.objects.annotate(
 #         products_count=Count('products')).all()
