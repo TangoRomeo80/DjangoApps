@@ -13,7 +13,7 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework import status
 from .filters import ProductFilter
 from .models import Collection, Product, OrderItem, Review, Cart, CartItem
-from .serializers import CollectionSerializer, ProductSerializer, ReviewSerializer, CartSerializer, CartItemSerializer
+from .serializers import CollectionSerializer, ProductSerializer, ReviewSerializer, CartSerializer, CartItemSerializer, AddCartItemSerializer
 
 
 # @api_view(['GET', 'POST'])
@@ -199,7 +199,14 @@ class CartViewSet(CreateModelMixin, RetrieveModelMixin, DestroyModelMixin, Gener
     serializer_class = CartSerializer
 
 class CartItemViewSet(ModelViewSet):
-    serializer_class = CartItemSerializer
+    
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return AddCartItemSerializer
+        return CartItemSerializer
+
+    def get_serializer_context(self):
+        return {'cart_id': self.kwargs['cart_pk']}
     
     def get_queryset(self):
         return CartItem.objects \
