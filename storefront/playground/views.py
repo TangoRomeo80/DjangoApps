@@ -5,6 +5,6 @@ from store.models import Product
 
 
 def say_hello(request):
-    
+    # Completed ORM
     
     return render(request, 'hello.html', {'name': 'Mosh'})
