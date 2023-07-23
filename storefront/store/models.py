@@ -11,6 +11,14 @@ class Collection(models.Model):
     featured_product = models.ForeignKey(
         'Product', on_delete=models.SET_NULL, null=True, related_name='+')
 
+    # Set the string representation of the model for admin panel
+    def __str__(self) -> str:
+        return self.title
+
+    # Class Meta is used to specify metadata for the model
+    class Meta:
+        # Specify default ordering for the model
+        ordering = ['title']
 
 class Product(models.Model):
     title = models.CharField(max_length=255)
@@ -21,6 +29,15 @@ class Product(models.Model):
     last_update = models.DateTimeField(auto_now=True)
     collection = models.ForeignKey(Collection, on_delete=models.PROTECT)
     promotions = models.ManyToManyField(Promotion)
+
+    # Set the string representation of the model for admin panel
+    def __str__(self) -> str:
+        return self.title
+
+    # Class Meta is used to specify metadata for the model
+    class Meta:
+        # Specify default ordering for the model
+        ordering = ['title']
 
 
 class Customer(models.Model):
