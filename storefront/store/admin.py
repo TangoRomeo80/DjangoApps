@@ -23,6 +23,16 @@ class InventoryFilter(admin.SimpleListFilter):
 # Class ProductAdmin is used to customize the admin panel for Product model
 @admin.register(models.Product) #Decorator for registering the Product admin with Product model
 class ProductAdmin(admin.ModelAdmin):
+    # Customize the creation form
+    # exclude = ('created_at', 'updated_at')
+    # fields = (('title', 'collection'), 'description', 'slug', ('inventory', 'unit_price'), 'last_update')
+    # readonly_fields = ('last_update', 'slug')
+    # Prepopulated fields for forms
+    prepopulated_fields = {
+        'slug': ['title']
+    }
+    # Autocomplete fields for forms
+    autocomplete_fields = ['collection']
     # Actions to be displayed in the admin panel
     actions = ['clear_inventory']
     # Specify the fields to be displayed in the admin panel
@@ -87,12 +97,14 @@ class CustomerAdmin(admin.ModelAdmin):
 @admin.register(models.Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = ['id', 'placed_at', 'customer']
+    autocomplete_fields = ['customer']
 
 
 # Register Collection model
 @admin.register(models.Collection)
 class CollectionAdmin(admin.ModelAdmin):
     list_display = ['title', 'products_count']
+    search_fields = ['title__istartswith']
 
     # Define a method for getting related field products count
     @admin.display(ordering='products_count') # Decorator for sorting the products_count column
