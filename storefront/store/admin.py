@@ -1,8 +1,10 @@
 from django.contrib import admin, messages
+from django.contrib.contenttypes.admin import GenericTabularInline
 from django.db.models.aggregates import Count
 from django.urls import reverse
 from django.utils.html import format_html, urlencode
 from . import models
+from tags.models import TaggedItem, Tag
 
 # class for filtering inventory
 class InventoryFilter(admin.SimpleListFilter):
@@ -20,6 +22,14 @@ class InventoryFilter(admin.SimpleListFilter):
         if self.value() == '<10':
             return queryset.filter(inventory__lt=10)
 
+#Inline class for managing tags in product
+class TagInline(GenericTabularInline):
+    # Specify the model to be used
+    model = TaggedItem
+    # Specify the autocomplete fields
+    autocomplete_fields = ['tag']
+
+
 # Class ProductAdmin is used to customize the admin panel for Product model
 @admin.register(models.Product) #Decorator for registering the Product admin with Product model
 class ProductAdmin(admin.ModelAdmin):
@@ -35,6 +45,8 @@ class ProductAdmin(admin.ModelAdmin):
     autocomplete_fields = ['collection']
     # Actions to be displayed in the admin panel
     actions = ['clear_inventory']
+    # Inlines to be displayed in the admin panel
+    inlines = [TagInline]
     # Specify the fields to be displayed in the admin panel
     list_display = ['title', 'unit_price', 'inventory_status', 'collection_title']
     # Specify the fields that can be edited
