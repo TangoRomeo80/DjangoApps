@@ -44,7 +44,7 @@ class ProductAdmin(admin.ModelAdmin):
     # Specify the fields to be used for filtering
     list_filter = ['collection', 'last_update', InventoryFilter]
     # # Specify the fields to be used for searching
-    # search_fields = ('title', 'description')
+    search_fields = ('title', 'description')
     # # Specify the fields to be used for ordering
     # ordering = ['title']
     # speciify fields to be eager loaded
@@ -93,11 +93,19 @@ class CustomerAdmin(admin.ModelAdmin):
             orders_count= Count('order')
         )
 
+# Class to enable inline editing of OrderItem model
+class OrderItemInline(admin.TabularInline):
+    autocomplete_fields = ['product']
+    model = models.OrderItem
+    extra = 0
+
 # Register Order model
 @admin.register(models.Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = ['id', 'placed_at', 'customer']
     autocomplete_fields = ['customer']
+    # Inline editing of OrderItem model
+    inlines = [OrderItemInline]
 
 
 # Register Collection model
