@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.db.models.aggregates import Count
 from django.urls import reverse
 from django.utils.html import format_html, urlencode
@@ -23,6 +23,8 @@ class InventoryFilter(admin.SimpleListFilter):
 # Class ProductAdmin is used to customize the admin panel for Product model
 @admin.register(models.Product) #Decorator for registering the Product admin with Product model
 class ProductAdmin(admin.ModelAdmin):
+    # Actions to be displayed in the admin panel
+    actions = ['clear_inventory']
     # Specify the fields to be displayed in the admin panel
     list_display = ['title', 'unit_price', 'inventory_status', 'collection_title']
     # Specify the fields that can be edited
@@ -48,6 +50,13 @@ class ProductAdmin(admin.ModelAdmin):
     # Define a method for getting related field collection title
     def collection_title(self, product):
         return product.collection.title
+
+    # Custom action to clear the inventory
+    @admin.action(description='Clear inventory')
+    def clear_inventory(self, request, queryset):
+        updated_count = queryset.update(inventory=0)
+        self.message_user(request, f'{updated_count} products were successfully updated.', messages.SUCCESS)
+        
 
 # Register Customer model
 @admin.register(models.Customer)
