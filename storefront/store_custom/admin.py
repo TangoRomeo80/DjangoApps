@@ -20,3 +20,6 @@ class CustomProductAdmin(ProductAdmin):
 admin.site.unregister(Product)
 # Register the CustomProductAdmin class
 admin.site.register(Product, CustomProductAdmin)
+
+
+# End of storefront 1
