@@ -14,9 +14,9 @@ from .serializers import ProductSerializer
 @api_view()
 def product_list(request):
     # get all products from database
-    queryset = Product.objects.all()
+    queryset = Product.objects.select_related('collection').all()
     # convert products to JSON
-    serializer = ProductSerializer(queryset, many=True)
+    serializer = ProductSerializer(queryset, many=True, context={'request': request})
     # return JSON
     return Response(serializer.data)
 
@@ -38,3 +38,7 @@ def product_detail(request, id):
     product = get_object_or_404(Product, pk=id)
     serializer = ProductSerializer(product)
     return Response(serializer.data)
+
+@api_view()
+def collection_detail(request, pk):
+    return Response('ok')
