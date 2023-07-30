@@ -35,10 +35,11 @@ def product_list(request):
 
         # Automatic Method
         serializer.is_valid(raise_exception=True)
-        serializer.validated_data
-        return Response('ok')
+        # save data to database
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-@api_view()
+@api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
 def product_detail(request, id):
     # Implementation with try/except
     # try:
@@ -54,8 +55,19 @@ def product_detail(request, id):
 
     # Implementation with get_object_or_404
     product = get_object_or_404(Product, pk=id)
-    serializer = ProductSerializer(product)
-    return Response(serializer.data)
+    if request.method == 'GET':
+        serializer = ProductSerializer(product)
+        return Response(serializer.data)
+    
+    elif request.method == 'PUT':
+        # Create an object of ProductSerializer
+        serializer = ProductSerializer(product, data=request.data)
+        # Check if data sent is valid and send validation error if not
+        serializer.is_valid(raise_exception=True)
+        # Save data to database
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
 
 @api_view()
 def collection_detail(request, pk):

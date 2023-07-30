@@ -52,11 +52,31 @@ class ProductSerializer(serializers.ModelSerializer):
     # create meta class which will define the fields
     class Meta:
         model = Product
-        fields = ['id', 'title','unit_price', 'price_with_tax', 'collection']
+        fields = ['id', 'title', 'description', 'slug', 'inventory', 'unit_price', 'price_with_tax', 'collection']
 
     # Custom field that is not in the model but will be created in the JSON
     price_with_tax = serializers.SerializerMethodField(method_name='calculate_tax')
     
     def calculate_tax(self, product: Product):
         return product.unit_price * Decimal(1.1)
+
+    # Overriding thhe create method
+    # def create(self, validated_data):
+    #     # Create a new product instance
+    #     product = Product(**validated_data)
+    #     # Set the other field to 1
+    #     product.other = 1
+    #     # Save the product
+    #     product.save()
+    #     # Return the product
+    #     return product
+
+    # # Overriding the update method
+    # def update(self, instance, validated_data):
+    #     # Update the product instance
+    #     instance.unit_price = validated_data.get('unit_price', instance.unit_price)
+    #     # Save the product
+    #     instance.save()
+    #     # Return the product
+    #     return instance
 
