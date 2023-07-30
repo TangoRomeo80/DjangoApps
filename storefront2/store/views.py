@@ -25,9 +25,18 @@ def product_list(request):
     elif request.method == 'POST':
         # create an object of ProductSerializer
         serializer = ProductSerializer(data=request.data)
-        
-        # return 400 status code for bad request
-        return Response('Ok')
+        # check if data sent is valid and send validation error if not
+        # Manual Method
+        # if serializer.is_valid():
+        #     serializer.validated_data
+        #     return Response('ok')
+        # else:
+        #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        # Automatic Method
+        serializer.is_valid(raise_exception=True)
+        serializer.validated_data
+        return Response('ok')
 
 @api_view()
 def product_detail(request, id):
