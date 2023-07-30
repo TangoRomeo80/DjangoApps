@@ -11,14 +11,23 @@ from .serializers import ProductSerializer
 #     return HttpResponse('OK')
 
 # rest framework response
-@api_view()
+@api_view(['GET', 'POST'])
 def product_list(request):
-    # get all products from database
-    queryset = Product.objects.select_related('collection').all()
-    # convert products to JSON
-    serializer = ProductSerializer(queryset, many=True, context={'request': request})
-    # return JSON
-    return Response(serializer.data)
+    # Check if the request is GET or POST
+    if request.method == 'GET':
+        # get all products from database
+        queryset = Product.objects.select_related('collection').all()
+        # convert products to JSON
+        serializer = ProductSerializer(queryset, many=True, context={'request': request})
+        # return JSON
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        # create an object of ProductSerializer
+        serializer = ProductSerializer(data=request.data)
+        
+        # return 400 status code for bad request
+        return Response('Ok')
 
 @api_view()
 def product_detail(request, id):
