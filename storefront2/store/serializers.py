@@ -14,7 +14,9 @@ from decimal import Decimal
 class CollectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Collection
-        fields = ['id', 'title']
+        fields = ['id', 'title', 'products_count']
+
+    products_count = serializers.IntegerField()
 
 # ProductSerializer is a class that converts Product model to JSON
 # class ProductSerializer(serializers.Serializer): # This is the implementation with base serializer
