@@ -4,6 +4,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+# from rest_framework.mixins import ListModelMixin, CreateModelMixin
 from rest_framework import status
 from .models import Product, Collection
 from .serializers import ProductSerializer, CollectionSerializer
@@ -12,34 +14,56 @@ from .serializers import ProductSerializer, CollectionSerializer
 # def product_list(request):
 #     return HttpResponse('OK')
 
+# rest framework response (generic view implementing mixins under the hood)
+class ProductList(ListCreateAPIView):
+
+
+    # override queryset to specify which data to return
+    # def get_queryset(self):
+    #     return Product.objects.select_related('collection').all()
+
+    # override serializer class to specify which serializer to use
+    # def get_serializer_class(self):
+    #     return ProductSerializer
+
+    # Use built in variable queryset to specify which data to return
+    queryset = Product.objects.select_related('collection').all()
+    # Use built in variable serializer_class to specify which serializer to use
+    serializer_class = ProductSerializer
+
+    # override get_serializer_context to specify which context to use
+    def get_serializer_context(self):
+        return {'request': self.request}
+
+
 # rest framework response (Class based view)
-class ProductList(APIView):
-    # Method to handle get request
-    def get(self, request):
-        # get all products from database
-        queryset = Product.objects.select_related('collection').all()
-        # convert products to JSON
-        serializer = ProductSerializer(queryset, many=True, context={'request': request})
-        # return JSON
-        return Response(serializer.data)
+# class ProductList(APIView):
+#     # Method to handle get request
+#     def get(self, request):
+#         # get all products from database
+#         queryset = Product.objects.select_related('collection').all()
+#         # convert products to JSON
+#         serializer = ProductSerializer(queryset, many=True, context={'request': request})
+#         # return JSON
+#         return Response(serializer.data)
 
-    # Method to handle post request
-    def post(self, request):
-        # create an object of ProductSerializer
-        serializer = ProductSerializer(data=request.data)
-        # check if data sent is valid and send validation error if not
-        # Manual Method
-        # if serializer.is_valid():
-        #     serializer.validated_data
-        #     return Response('ok')
-        # else:
-        #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#     # Method to handle post request
+#     def post(self, request):
+#         # create an object of ProductSerializer
+#         serializer = ProductSerializer(data=request.data)
+#         # check if data sent is valid and send validation error if not
+#         # Manual Method
+#         # if serializer.is_valid():
+#         #     serializer.validated_data
+#         #     return Response('ok')
+#         # else:
+#         #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        # Automatic Method
-        serializer.is_valid(raise_exception=True)
-        # save data to database
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         # Automatic Method
+#         serializer.is_valid(raise_exception=True)
+#         # save data to database
+#         serializer.save()
+#         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 # rest framework response (Method based view)
 # @api_view(['GET', 'POST'])
@@ -136,19 +160,13 @@ class ProductDetail(APIView):
 #         product.delete()
 #         return Response(status=status.HTTP_204_NO_CONTENT)
 
+# Collection List with generic class based view
+class CollectionList(ListCreateAPIView):
+    queryset = Collection.objects.annotate(
+        products_count=Count('products')).all()
+    serializer_class = CollectionSerializer
 
-@api_view(['GET', 'POST'])
-def collection_list(request):
-    if request.method == 'GET':
-        queryset = Collection.objects.annotate(products_count=Count('products')).all()
-        serializer = CollectionSerializer(queryset, many=True)
-        return Response(serializer.data)
-    elif request.method == 'POST':
-        serializer = CollectionSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
+    
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def collection_detail(request, pk):

@@ -16,7 +16,7 @@ class CollectionSerializer(serializers.ModelSerializer):
         model = Collection
         fields = ['id', 'title', 'products_count']
 
-    products_count = serializers.IntegerField()
+    products_count = serializers.IntegerField(read_only=True)
 
 # ProductSerializer is a class that converts Product model to JSON
 # class ProductSerializer(serializers.Serializer): # This is the implementation with base serializer

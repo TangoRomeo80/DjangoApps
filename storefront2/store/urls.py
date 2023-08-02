@@ -9,4 +9,5 @@ urlpatterns = [
     # path('collections/<int:pk>/', views.collection_detail, name='collection-detail'),
     path('products/', views.ProductList.as_view()), # Class based view
     path('products/<int:id>/', views.ProductDetail.as_view()), # Class based view
+    path('collections/', views.CollectionList.as_view()), # Class based view
 ]
