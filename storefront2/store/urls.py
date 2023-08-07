@@ -1,15 +1,24 @@
 from django.urls import path
-from rest_framework.routers import SimpleRouter
+# from rest_framework.routers import DefaultRouter
+from rest_framework_nested import routers
 from . import views
 
-router = SimpleRouter()
+# router = DefaultRouter()
+# Use default router from rest_framework_nested instead
+router = routers.DefaultRouter()
 # When using viewsets, we are not going to explicitly create the URL patterns
 # Use routers instead
 router.register('products', views.ProductViewSet)
 router.register('collections', views.CollectionViewSet)
 
+# Nested router
+# Create a nested router for reviews
+products_router = routers.NestedDefaultRouter(router, 'products', lookup='product')
+# Register the review viewset
+products_router.register('reviews', views.ReviewViewSet, basename='product-reviews')
+
 # URLConf
-urlpatterns = router.urls # This will generate the URL patterns for us
+urlpatterns = router.urls  + products_router.urls # This will generate the URL patterns for us
 
 # To also inclue custom URL patterns, we can do the following
 # urlpatterns = router.urls + [ Other paths here ]
