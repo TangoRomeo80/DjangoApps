@@ -8,7 +8,7 @@ from . import views
 router = routers.DefaultRouter()
 # When using viewsets, we are not going to explicitly create the URL patterns
 # Use routers instead
-router.register('products', views.ProductViewSet)
+router.register('products', views.ProductViewSet, basename='products')
 router.register('collections', views.CollectionViewSet)
 
 # Nested router

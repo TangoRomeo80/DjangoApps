@@ -17,8 +17,16 @@ from .serializers import ProductSerializer, CollectionSerializer, ReviewSerializ
 
 # Implementation using viewsets
 class ProductViewSet(ModelViewSet):
-    queryset = Product.objects.all()
+    # queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
+    # Override get_queryset method to filter data
+    def get_queryset(self):
+        queryset = Product.objects.all()
+        collection_id = self.request.query_params.get('collection_id')
+        if collection_id is not None:
+            queryset = queryset.filter(collection_id=collection_id)
+        return queryset
 
     # override get_serializer_context to specify which context to use
     def get_serializer_context(self):
