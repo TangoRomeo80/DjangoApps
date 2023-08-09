@@ -1,15 +1,17 @@
 from django.db.models.aggregates import Count
-from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
+# from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.views import APIView
+# from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+# from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 # from rest_framework.mixins import ListModelMixin, CreateModelMixin
 from rest_framework import status
 
+from .pagination import DefaultPagination
 from .filters import ProductFilter
 from .models import OrderItem, Product, Collection, Review
 from .serializers import ProductSerializer, CollectionSerializer, ReviewSerializer
@@ -23,8 +25,16 @@ class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     # Use filter backend to filter data
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    # filterset_class is used to specify which filter to use
     filterset_class = ProductFilter
+    # pagination_class is used to specify which pagination to use, but it can be defined in settings for all views
+    pagination_class = DefaultPagination
+    # search_fields is used to specify which fields to search
+    search_fields = ['title', 'description']
+    # ordering_fields is used to specify which fields to order by
+    ordering_fields = ['unit_price', 'last_update']
+
 
     # Override get_queryset method to filter data
     # def get_queryset(self):
