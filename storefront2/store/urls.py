@@ -10,7 +10,7 @@ router = routers.DefaultRouter()
 # Use routers instead
 router.register('products', views.ProductViewSet, basename='products')
 router.register('collections', views.CollectionViewSet)
-
+router.register('carts', views.CartViewSet)
 # Nested router
 # Create a nested router for reviews
 products_router = routers.NestedDefaultRouter(router, 'products', lookup='product')

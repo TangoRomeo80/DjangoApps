@@ -6,15 +6,15 @@ from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 # from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
 # from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-# from rest_framework.mixins import ListModelMixin, CreateModelMixin
+from rest_framework.mixins import CreateModelMixin
 from rest_framework import status
 
 from .pagination import DefaultPagination
 from .filters import ProductFilter
-from .models import OrderItem, Product, Collection, Review
-from .serializers import ProductSerializer, CollectionSerializer, ReviewSerializer
+from .models import Cart, OrderItem, Product, Collection, Review
+from .serializers import CartSerializer, ProductSerializer, CollectionSerializer, ReviewSerializer
 
 # default django built in response
 # def product_list(request):
@@ -299,3 +299,7 @@ class ReviewViewSet(ModelViewSet):
     # Override the get_serializer_context method
     def get_serializer_context(self):
         return {'product_id': self.kwargs['product_pk']}
+
+class CartViewSet(CreateModelMixin, GenericViewSet):
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
