@@ -11,17 +11,21 @@ router = routers.DefaultRouter()
 router.register('products', views.ProductViewSet, basename='products')
 router.register('collections', views.CollectionViewSet)
 router.register('carts', views.CartViewSet)
+router.register('customers', views.CustomerViewSet)
 # Nested router
 # Create a nested router for reviews
-products_router = routers.NestedDefaultRouter(router, 'products', lookup='product')
+products_router = routers.NestedDefaultRouter(
+    router, 'products', lookup='product')
 # Register the review viewset
-products_router.register('reviews', views.ReviewViewSet, basename='product-reviews')
+products_router.register('reviews', views.ReviewViewSet,
+                         basename='product-reviews')
 
 carts_router = routers.NestedDefaultRouter(router, 'carts', lookup='cart')
 carts_router.register('items', views.CartItemViewSet, basename='cart-items')
 
 # URLConf
-urlpatterns = router.urls  + products_router.urls + carts_router.urls # This will generate the URL patterns for us
+urlpatterns = router.urls + products_router.urls + \
+    carts_router.urls  # This will generate the URL patterns for us
 
 # To also inclue custom URL patterns, we can do the following
 # urlpatterns = router.urls + [ Other paths here ]

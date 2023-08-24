@@ -8,19 +8,21 @@ from rest_framework.response import Response
 # from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 # from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, DestroyModelMixin
+from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, DestroyModelMixin, UpdateModelMixin
 from rest_framework import status
 
 from .pagination import DefaultPagination
 from .filters import ProductFilter
-from .models import Cart, CartItem, OrderItem, Product, Collection, Review
-from .serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, ProductSerializer, CollectionSerializer, ReviewSerializer, UpdateCartItemSerializer
+from .models import Cart, CartItem, Customer, OrderItem, Product, Collection, Review
+from .serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, CustomerSerializer, ProductSerializer, CollectionSerializer, ReviewSerializer, UpdateCartItemSerializer
 
 # default django built in response
 # def product_list(request):
 #     return HttpResponse('OK')
 
 # Implementation using viewsets
+
+
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
@@ -35,7 +37,6 @@ class ProductViewSet(ModelViewSet):
     # ordering_fields is used to specify which fields to order by
     ordering_fields = ['unit_price', 'last_update']
 
-
     # Override get_queryset method to filter data
     # def get_queryset(self):
     #     queryset = Product.objects.all()
@@ -44,9 +45,8 @@ class ProductViewSet(ModelViewSet):
     #         queryset = queryset.filter(collection_id=collection_id)
     #     return queryset
 
-
-
     # override get_serializer_context to specify which context to use
+
     def get_serializer_context(self):
         return {'request': self.request}
 
@@ -210,7 +210,7 @@ class ProductViewSet(ModelViewSet):
 #     if request.method == 'GET':
 #         serializer = ProductSerializer(product)
 #         return Response(serializer.data)
-    
+
 #     elif request.method == 'PUT':
 #         # Create an object of ProductSerializer
 #         serializer = ProductSerializer(product, data=request.data)
@@ -267,7 +267,7 @@ class CollectionViewSet(ModelViewSet):
 #             return Response({'error': 'Collection cannot be deleted because it includes one or more products.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 #         collection.delete()
 #         return Response(status=status.HTTP_204_NO_CONTENT)
-    
+
 
 # @api_view(['GET', 'PUT', 'DELETE'])
 # def collection_detail(request, pk):
@@ -300,14 +300,17 @@ class ReviewViewSet(ModelViewSet):
     def get_serializer_context(self):
         return {'product_id': self.kwargs['product_pk']}
 
+
 class CartViewSet(CreateModelMixin,
-                    RetrieveModelMixin,
-                    DestroyModelMixin,
-                    GenericViewSet,):
+                  RetrieveModelMixin,
+                  DestroyModelMixin,
+                  GenericViewSet,):
     queryset = Cart.objects.prefetch_related('items__product').all()
     serializer_class = CartSerializer
 
 # Modelviewset for cart items
+
+
 class CartItemViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete']
 
@@ -320,8 +323,14 @@ class CartItemViewSet(ModelViewSet):
 
     def get_serializer_context(self):
         return {'cart_id': self.kwargs['cart_pk']}
-    
+
     def get_queryset(self):
         return CartItem.objects.filter(cart_id=self.kwargs['cart_pk']).select_related('product')
 
-    
+
+class CustomerViewSet(CreateModelMixin,
+                      UpdateModelMixin,
+                      RetrieveModelMixin,
+                      GenericViewSet):
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer
