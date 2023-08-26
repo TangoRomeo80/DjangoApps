@@ -11,6 +11,9 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, DestroyModelMixin, UpdateModelMixin
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated, AllowAny, DjangoModelPermissions, IsAdminUser
+
+from store.permissions import FullDjangoModelPermissions, IsAdminOrReadOnly, ViewCustomerHistoryPermission
 
 from .pagination import DefaultPagination
 from .filters import ProductFilter
@@ -37,6 +40,8 @@ class ProductViewSet(ModelViewSet):
     search_fields = ['title', 'description']
     # ordering_fields is used to specify which fields to order by
     ordering_fields = ['unit_price', 'last_update']
+    # Set permission classes to use
+    permission_classes = [IsAdminOrReadOnly]
 
     # Override get_queryset method to filter data
     # def get_queryset(self):
@@ -233,6 +238,8 @@ class CollectionViewSet(ModelViewSet):
     queryset = Collection.objects.annotate(
         products_count=Count('products')).all()
     serializer_class = CollectionSerializer
+    # Set permission classes to use
+    permission_classes = [IsAdminOrReadOnly]
 
     # Override built in destroy method
     def destroy(self, request, *args, **kwargs):
@@ -329,16 +336,26 @@ class CartItemViewSet(ModelViewSet):
         return CartItem.objects.filter(cart_id=self.kwargs['cart_pk']).select_related('product')
 
 
-class CustomerViewSet(CreateModelMixin,
-                      UpdateModelMixin,
-                      RetrieveModelMixin,
-                      GenericViewSet):
+class CustomerViewSet(ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+    # Permission classes are used to specify which permissions to use
+    # permission_classes = [
+    #     FullDjangoModelPermissions
+    # ]
+    permission_classes = [IsAdminUser]
 
-    @action(detail=False, methods=['GET', 'PUT'])
+    # Override the get_permissions method
+    def get_permissions(self):
+        # Allow any user to get the customer
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
+    @action(detail=False, methods=['GET', 'PUT'], permission_classes=[IsAuthenticated])
     def me(self, request):
-        (customer, created) = Customer.objects.get_or_create(user_id=request.user.id)
+        (customer, created) = Customer.objects.get_or_create(
+            user_id=request.user.id)
         if request.method == 'GET':
             serializer = CustomerSerializer(customer)
             return Response(serializer.data)
@@ -347,3 +364,7 @@ class CustomerViewSet(CreateModelMixin,
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
+
+    @action(detail=True, permission_classes=[ViewCustomerHistoryPermission])
+    def history(self, request, pk):
+        return Response({'message': f'History for customer {pk}'})
