@@ -17,8 +17,8 @@ from store.permissions import FullDjangoModelPermissions, IsAdminOrReadOnly, Vie
 
 from .pagination import DefaultPagination
 from .filters import ProductFilter
-from .models import Cart, CartItem, Customer, OrderItem, Product, Collection, Review
-from .serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, CustomerSerializer, ProductSerializer, CollectionSerializer, ReviewSerializer, UpdateCartItemSerializer
+from .models import Cart, CartItem, Customer, Order, OrderItem, Product, Collection, Review
+from .serializers import AddCartItemSerializer, CartItemSerializer, CartSerializer, CreateOrderSerializer, CustomerSerializer, OrderSerializer, ProductSerializer, CollectionSerializer, ReviewSerializer, UpdateCartItemSerializer
 
 # default django built in response
 # def product_list(request):
@@ -368,3 +368,23 @@ class CustomerViewSet(ModelViewSet):
     @action(detail=True, permission_classes=[ViewCustomerHistoryPermission])
     def history(self, request, pk):
         return Response({'message': f'History for customer {pk}'})
+
+
+class OrderViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return CreateOrderSerializer
+        return OrderSerializer
+
+    def get_serializer_context(self):
+        return {'user_id': self.request.user.id}
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:
+            return Order.objects.all()
+        (customer_id, created) = Customer.objects.only(
+            'id').get_or_create(user_id=user.id)
+        return Order.objects.filter(customer_id=customer_id)
