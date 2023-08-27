@@ -224,3 +224,8 @@ class CreateOrderSerializer(serializers.BaseSerializer):
             OrderItem.objects.bulk_create(order_items)
             Cart.objects.filter(pk=self.validated_data['cart_id']).delete()
             return order
+
+class UpdateOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['payment_status']
