@@ -196,13 +196,21 @@ class OrderSerializer(serializers.ModelSerializer):
 class CreateOrderSerializer(serializers.BaseSerializer):
     cart_id = serializers.UUIDField()
 
+    def validate_cart_id(self, cart_id):
+        if not Cart.objects.filter(pk=cart_id).exists():
+            raise serializers.ValidationError(
+                'No cart with this id was found')
+        if CartItem.objects.filter(cart_id=cart_id).count() == 0:
+            raise serializers.ValidationError(
+                'The cart is empty')
+        return cart_id
+
     def save(self, **kwargs):
         # Making sure that the whole process is atomic with transactions
         with transaction.atomic():
             (customer, created) = Customer.objects.get_or_create(
                 user_id=self.context['user_id'])
             order = Order.objects.create(customer=customer)
-
             cart_items = CartItem.objects.select_related(
                 'product').filter(cart_id=self.validated_data['cart_id'])
             order_items = [
