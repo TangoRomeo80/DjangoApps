@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Cart, CartItem, Customer, Order, OrderItem, Product, Collection, Review
 from decimal import Decimal
 from django.db import transaction
+from .signals import order_created
 
 
 # Serializer is a class that converts model to JSON
@@ -223,6 +224,7 @@ class CreateOrderSerializer(serializers.BaseSerializer):
             ]
             OrderItem.objects.bulk_create(order_items)
             Cart.objects.filter(pk=self.validated_data['cart_id']).delete()
+            order_created.send_robust(self.__class__, order=order)
             return order
 
 class UpdateOrderSerializer(serializers.ModelSerializer):
