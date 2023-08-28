@@ -43,6 +43,13 @@ class Product(models.Model):
         ordering = ['title']
 
 
+# Class for product images
+class ProductImage(models.Model):
+    # ForeignKey is a one-to-many relationship between product and product image
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images') # Delete images when product is deleted
+    image = models.ImageField(upload_to='store/images') # Upload images to product-images folder (Needs pillow installed)
+
+
 class Customer(models.Model):
     MEMBERSHIP_BRONZE = 'B'
     MEMBERSHIP_SILVER = 'S'
