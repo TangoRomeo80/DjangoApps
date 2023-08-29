@@ -17,6 +17,7 @@ django-templated-mail = "*"
 redis = "*"
 pymysql = "*"
 celery = "*"
+flower = "*"
 
 [dev-packages]
 

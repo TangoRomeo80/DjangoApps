@@ -1,10 +1,12 @@
 from django.core.mail import send_mail, mail_admins, BadHeaderError, EmailMessage
 from django.shortcuts import render
 from templated_mail.mail import BaseEmailMessage
+from .tasks import notify_customers
 
 
 def say_hello(request):
-    try:
+    notify_customers.delay('Hello World')
+    # try:
         # send mail to users
         # send_mail('Subject here', 'Here is the message.', 'admin@localhost.com', [
         #     'bob@localhost.com',
@@ -23,14 +25,14 @@ def say_hello(request):
         # message.send()
 
         # send mail with template
-        message = BaseEmailMessage(
-            template_name='emails/hello.html',
-            context={
-                'name': 'Mosh'
-            }
-        )
-        message.send(['mosh@localhost.com'])
+    #     message = BaseEmailMessage(
+    #         template_name='emails/hello.html',
+    #         context={
+    #             'name': 'Mosh'
+    #         }
+    #     )
+    #     message.send(['mosh@localhost.com'])
 
-    except BadHeaderError:  
-        pass
+    # except BadHeaderError:  
+    #     pass
     return render(request, 'hello.html', {'name': 'Mosh'})
