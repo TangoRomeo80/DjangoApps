@@ -191,5 +191,3 @@ DEFAULT_FROM_EMAIL = 'admin@localhost.com'
 ADMINS = [
     ('Admin', 'admin@gmail.com'),
 ]
-
-# After going to ubuntu
