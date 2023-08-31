@@ -28,6 +28,8 @@ class ProductImageViewSet(ModelViewSet):
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.prefetch_related('images').all()
+    # Create artificial performannce issue without prefetch_related for test
+    # queryset = Product.objects.all()
     serializer_class = ProductSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = ProductFilter
