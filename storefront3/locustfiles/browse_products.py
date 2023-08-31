@@ -40,3 +40,5 @@ class WebsiteUser(HttpUser):
         )
         result = respone.json()
         self.cart_id = result['id']
+
+# Run the test
