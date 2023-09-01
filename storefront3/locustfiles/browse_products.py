@@ -33,6 +33,11 @@ class WebsiteUser(HttpUser):
             json={'product_id': product_id, 'quantity': 1}
         )
 
+    # Simulation endpoint for slow API
+    @task
+    def say_hello(self):
+        self.client.get('/playground/say-hello/')
+
     # cart id to be generated when user adds product to cart, so use lifecycle hook
     def on_start(self):
         respone = self.client.post(
