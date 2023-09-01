@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework',
     'djoser',
-    'silk',
+    # 'silk',
     'playground',
     'debug_toolbar',
     'store',
@@ -66,8 +66,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-if DEBUG:
-    MIDDLEWARE += ['silk.middleware.SilkyMiddleware']
+# if DEBUG:
+#     MIDDLEWARE += ['silk.middleware.SilkyMiddleware']
 
 # Settings for Django Debug Toolbar
 INTERNAL_IPS = [
