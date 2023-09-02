@@ -6,15 +6,23 @@ from templated_mail.mail import BaseEmailMessage
 from django.utils.decorators import method_decorator
 import requests
 from rest_framework.views import APIView
+import logging
 # from .tasks import notify_customers
 
 
+logger = logging.getLogger(__name__)
+
 # Caching a class based view
-class HellowView(APIView):
-    @method_decorator(cache_page(10 * 60))
-    def get_authenticate_header(self, request):
-        response = requests.get('https://httpbin.org/delay/2')
-        data = response.json()
+class HelloView(APIView):
+    # @method_decorator(cache_page(10 * 60))
+    def get(self, request):
+        try:
+            logger.info('Calling httpbin')
+            response = requests.get('https://httpbin.org/delay/2')
+            logger.info('Got response from httpbin')
+            data = response.json()
+        except request.ConnectionError:
+            logger.critical('Httpbin is offline')
         return render(request, 'hello.html', {'name': data})
 
 
